@@ -1,0 +1,32 @@
+db.sqlite3
+.DS_Store
+../.DS_Store
+venv# Django
+*.log
+*.pot
+*.pyc
+__pycache__/
+db.sqlite3
+media/
+staticfiles/
+
+# Environment
+.env
+.env.local
+.env.production
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+../.DS_Store
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
