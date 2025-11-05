@@ -29,3 +29,39 @@ class RequestLog(models.Model):
 
     def __str__(self):
         return f"{self.ip_address} - {self.path} at {self.timestamp}"
+
+
+class BlockedIP(models.Model):
+    """
+    Model to store blocked IP addresses.
+    """
+
+    ip_address = models.GenericIPAddressField(
+        unique=True,
+        help_text="IP address to block",
+    )
+    reason = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Reason for blocking this IP address",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="When this IP was blocked",
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this block is currently active",
+    )
+
+    class Meta:
+        verbose_name = "Blocked IP"
+        verbose_name_plural = "Blocked IPs"
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["ip_address", "is_active"]),
+        ]
+
+    def __str__(self):
+        status = "Active" if self.is_active else "Inactive"
+        return f"{self.ip_address} ({status})"
