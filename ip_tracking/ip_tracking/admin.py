@@ -1,19 +1,27 @@
 from django.contrib import admin
-from .models import RequestLog,BlockedIP
+from .models import RequestLog, BlockedIP
 
 
 @admin.register(RequestLog)
 class RequestLogAdmin(admin.ModelAdmin):
-    """Admin view"""
+    """IP request log admin view"""
 
-    list_display = ("ip_address", "path", "timestamp")
-    list_filter = ("timestamp",)
-    search_fields = ("ip_address", "path")
-    readonly_fields = ("ip_address", "path", "timestamp")
+    list_display = ("ip_address", "city", "country", "path", "timestamp")
+    list_filter = ("timestamp", "country", "city")
+    search_fields = ("ip_address", "path", "country", "city")
+    readonly_fields = ("ip_address", "path", "timestamp", "country", "city")
+    date_hierarchy = "timestamp"
+
+    fieldsets = (
+        ("Request Information", {"fields": ("ip_address", "path", "timestamp")}),
+        ("Geolocation", {"fields": ("country", "city")}),
+    )
 
 
 @admin.register(BlockedIP)
 class BlockedIPAdmin(admin.ModelAdmin):
+    """Blocked IPs admin view"""
+
     list_display = ("ip_address", "is_active", "created_at", "reason_preview")
     list_filter = ("is_active", "created_at")
     search_fields = ("ip_address", "reason")
