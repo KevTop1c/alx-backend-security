@@ -61,6 +61,7 @@ class BlockedIPAdmin(admin.ModelAdmin):
 
 @admin.register(SuspiciousIP)
 class SuspiciousIPAdmin(admin.ModelAdmin):
+    """Suspicious IP admin view"""
     list_display = (
         "ip_address",
         "request_count",
