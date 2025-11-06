@@ -164,3 +164,10 @@ RATELIMIT_RATE = {
     "anonymous": "5/m",  # 5 requests per minute for anonymous users
     "authenticated": "10/m",  # 10 requests per minute for authenticated users
 }
+
+CELERY_BROKER_URL = "redis://localhost:6379/0"  # Or use 'amqp://localhost' for RabbitMQ
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"

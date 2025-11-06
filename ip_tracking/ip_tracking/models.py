@@ -1,6 +1,7 @@
 from django.db import models
 
 
+# pylint: disable=no-member
 class RequestLog(models.Model):
     """
     Model to store request logs with IP address, timestamp, and path.
@@ -84,3 +85,52 @@ class BlockedIP(models.Model):
     def __str__(self):
         status = "Active" if self.is_active else "Inactive"
         return f"{self.ip_address} ({status})"
+
+
+class SuspiciousIP(models.Model):
+    """
+    Model to store suspicious IP addresses flagged by anomaly detection.
+    """
+
+    ip_address = models.GenericIPAddressField(
+        help_text="Suspicious IP address",
+    )
+    reason = models.TextField(
+        help_text="Reason why this IP was flagged as suspicious",
+    )
+    flagged_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="When this IP was flagged",
+    )
+    request_count = models.IntegerField(
+        default=0,
+        help_text="Number of requests in the detection period",
+    )
+    is_resolved = models.BooleanField(
+        default=False,
+        help_text="Whether this flag has been reviewed and resolved",
+    )
+    resolved_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        help_text="When this flag was resolved",
+    )
+    notes = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Admin notes about this flag",
+    )
+
+    class Meta:
+        verbose_name = "Suspicious IP"
+        verbose_name_plural = "Suspicious IPs"
+        ordering = ["-flagged_at"]
+        indexes = [
+            models.Index(fields=["ip_address"]),
+            models.Index(fields=["is_resolved"]),
+            models.Index(fields=["-flagged_at"]),
+        ]
+
+    def __str__(self):
+        status = "Resolved" if self.is_resolved else "Unresolved"
+        return f"{self.ip_address} - {status} ({self.flagged_at.strftime('%Y-%m-%d %H:%M')})"
