@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib import admin
 from .models import RequestLog, BlockedIP, SuspiciousIP
 
@@ -90,7 +91,6 @@ class SuspiciousIPAdmin(admin.ModelAdmin):
 
     def mark_as_resolved(self, request, queryset):
         """Mark selected flags as resolved"""
-        from django.utils import timezone
 
         count = queryset.update(is_resolved=True, resolved_at=timezone.now())
         self.message_user(request, f"{count} flag(s) marked as resolved.")
@@ -106,7 +106,6 @@ class SuspiciousIPAdmin(admin.ModelAdmin):
 
     def block_selected_ips(self, request, queryset):
         """Block all IPs in selected flags"""
-        from django.utils import timezone
 
         blocked_count = 0
         for suspicious_ip in queryset:
