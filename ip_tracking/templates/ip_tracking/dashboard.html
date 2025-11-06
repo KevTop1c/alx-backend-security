@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .dashboard-container {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #e9ecef;
+      }
+      h1 {
+        color: #333;
+        margin: 0;
+      }
+      .user-info {
+        color: #666;
+        font-size: 14px;
+      }
+      .logout-btn {
+        padding: 8px 16px;
+        background-color: #dc3545;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-left: 15px;
+      }
+      .logout-btn:hover {
+        background-color: #c82333;
+      }
+      .info-card {
+        background-color: #e7f3ff;
+        border-left: 4px solid #007bff;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+      }
+      .info-card h3 {
+        margin-top: 0;
+        color: #0056b3;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 30px;
+      }
+      .stat-box {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .stat-box h3 {
+        margin: 0 0 10px 0;
+        font-size: 14px;
+        text-transform: uppercase;
+        opacity: 0.9;
+      }
+      .stat-box .value {
+        font-size: 32px;
+        font-weight: bold;
+      }
+      .logs-section {
+        margin-top: 30px;
+      }
+      .logs-section h2 {
+        color: #333;
+        margin-bottom: 15px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+      th {
+        background-color: #f8f9fa;
+        color: #495057;
+        font-weight: 600;
+        text-align: left;
+        padding: 12px;
+        border-bottom: 2px solid #dee2e6;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #dee2e6;
+      }
+      tr:hover {
+        background-color: #f8f9fa;
+      }
+      .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #999;
+      }
+      .location {
+        color: #666;
+        font-size: 14px;
+      }
+      .timestamp {
+        color: #999;
+        font-size: 13px;
+      }
+      .rate-limit-info {
+        background-color: #fff3cd;
+        border: 1px solid #ffc107;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+      .rate-limit-info strong {
+        color: #856404;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <header>
+        <div>
+          <h1>Dashboard</h1>
+          <div class="user-info">
+            Welcome, <strong>{{ user.username }}</strong>
+            <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+          </div>
+        </div>
+      </header>
+
+      <div class="rate-limit-info">
+        <strong>Rate Limit:</strong> This dashboard is limited to 100 requests
+        per hour for authenticated users.
+      </div>
+
+      <div class="info-card">
+        <h3>Your Current IP Address</h3>
+        <p style="font-size: 18px; margin: 0">
+          <strong>{{ client_ip }}</strong>
+        </p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <h3>Total Requests</h3>
+          <div class="value">{{ recent_logs|length }}</div>
+        </div>
+        <div
+          class="stat-box"
+          style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+        >
+          <h3>Your IP</h3>
+          <div class="value" style="font-size: 20px">{{ client_ip }}</div>
+        </div>
+        <div
+          class="stat-box"
+          style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
+        >
+          <h3>User Status</h3>
+          <div class="value" style="font-size: 20px">Active</div>
+        </div>
+      </div>
+
+      <div class="logs-section">
+        <h2>Recent Request Logs (Last 10)</h2>
+
+        {% if recent_logs %}
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Path</th>
+              <th>Location</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for log in recent_logs %}
+            <tr>
+              <td>
+                <span class="timestamp"
+                  >{{ log.timestamp|date:"Y-m-d H:i:s" }}</span
+                >
+              </td>
+              <td>{{ log.path }}</td>
+              <td>
+                <span class="location">
+                  {% if log.city and log.country %} {{ log.city }}, {{
+                  log.country }} {% elif log.country %} {{ log.country }} {%
+                  else %} Unknown {% endif %}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="no-data">
+          <p>No request logs found for your IP address.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </body>
+</html>

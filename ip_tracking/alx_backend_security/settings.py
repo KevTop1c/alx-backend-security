@@ -56,7 +56,7 @@ ROOT_URLCONF = "alx_backend_security.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -82,9 +82,9 @@ DATABASES = {
 }
 
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'cache_table',
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
     }
 }
 
@@ -147,5 +147,20 @@ LOGGING = {
             "level": "INFO",
             "propagate": False,
         },
+        "django_ratelimit": {
+            "handlers": ["file"],
+            "level": "WARNING",
+        },
     },
+}
+
+# Rate limiting configuration
+RATELIMIT_USE_CACHE = "default"
+RATELIMIT_ENABLE = True
+RATELIMIT_VIEW = "ip_tracking.views.rate_limit_handler"
+
+# Custom rate limit settings
+RATELIMIT_RATE = {
+    "anonymous": "5/m",  # 5 requests per minute for anonymous users
+    "authenticated": "10/m",  # 10 requests per minute for authenticated users
 }
